@@ -32,14 +32,9 @@ jobs:
           git config --global user.email "ci@github.com"
           git config --global user.name "CI Runner"
           
-          # Delete existing config to avoid 'already exists' error
-          rm -f .dvc/config
-          
-          # Create new config dynamically
-          dvc remote add -d origin https://dagshub.com/Suraj-Kumar09/Capstone-Project.dvc
-          
-          dvc pull
-          dvc repro -f
+          # DVC command not found ko fix karne ke liye 'python -m' use karein
+          python -m dvc pull
+          python -m dvc repro -f
 
       # - name: Run model tests
       #   env:
