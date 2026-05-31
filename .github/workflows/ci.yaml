@@ -32,7 +32,9 @@ jobs:
         # env:
         #   CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
         run: |
-          dvc repro
+          git config --global user.email "ci@github.com"
+          git config --global user.name "CI Runner"
+          dvc repro -f --no-pull
 
       # - name: Run model tests
       #   env:
