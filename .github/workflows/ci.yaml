@@ -32,11 +32,18 @@ jobs:
       - name: run pipeline
         env:
           PYTHONPATH: ${{ github.workspace }}
-          # Python code "atlas" dhoond raha hai, toh yahan wahi naam map kiya hai
+          # Python code "atlas" dhoond raha hai
           atlas: ${{ secrets.atlas }} 
         run: |
           git config --global user.email "ci@github.com"
           git config --global user.name "CI Runner"
+          
+          # DVC remote set karein (DagsHub ka URL)
+          dvc remote add -d origin https://dagshub.com/Suraj-Kumar09/Capstone-Project.dvc
+          dvc remote modify origin --local auth basic
+          dvc remote modify origin --local user ${{ secrets.DAGSHUB_USERNAME }}
+          dvc remote modify origin --local password ${{ secrets.atlas }}
+          
           dvc pull
           dvc repro -f
 
