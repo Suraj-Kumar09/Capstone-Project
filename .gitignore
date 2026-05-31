@@ -210,7 +210,7 @@ tempCodeRunnerFile.py
 .pypirc
 cred.txt
 local_s3/
-model/
+models/
 data/
 
 
