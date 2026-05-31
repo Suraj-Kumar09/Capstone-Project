@@ -32,8 +32,9 @@ jobs:
       - name: run pipeline
         env:
           PYTHONPATH: ${{ github.workspace }}
-          # Python code "atlas" dhoond raha hai
-          atlas: ${{ secrets.atlas }} 
+          # Python code "atlas" dhoond raha hai, isliye yahan variable ka naam 'atlas' rakha hai
+          # Lekin value GitHub Secret 'ATLAS' se aa rahi hai
+          atlas: ${{ secrets.ATLAS }} 
         run: |
           git config --global user.email "ci@github.com"
           git config --global user.name "CI Runner"
@@ -42,27 +43,27 @@ jobs:
           dvc remote add -d origin https://dagshub.com/Suraj-Kumar09/Capstone-Project.dvc
           dvc remote modify origin --local auth basic
           dvc remote modify origin --local user ${{ secrets.DAGSHUB_USERNAME }}
-          dvc remote modify origin --local password ${{ secrets.atlas }}
+          dvc remote modify origin --local password ${{ secrets.ATLAS }}
           
           dvc pull
           dvc repro -f
 
       # - name: Run model tests
       #   env:
-      #     atlas: ${{ secrets.atlas }}
+      #     atlas: ${{ secrets.ATLAS }}
       #   run: |
       #     python -m unittest tests/test_model.py
 
       # - name: Promote model to production
       #   if: success()
       #   env:
-      #     atlas: ${{ secrets.atlas }}
+      #     atlas: ${{ secrets.ATLAS }}
       #   run: python scripts/promote_model.py
 
       # - name: Run Flask app tests
       #   if: success()
       #   env:
-      #     atlas: ${{ secrets.atlas }}
+      #     atlas: ${{ secrets.ATLAS }}
       #   run: python -m unittest tests/test_flask_app.py
 
       # - name: Login to AWS ECR
@@ -101,7 +102,7 @@ jobs:
       # - name: Create Kubernetes Secret
       #   run: |
       #     kubectl create secret generic capstone-secret \
-      #       --from-literal=atlas=${{ secrets.atlas }} --dry-run=client -o yaml | kubectl apply -f -
+      #       --from-literal=atlas=${{ secrets.ATLAS }} --dry-run=client -o yaml | kubectl apply -f -
 
       # - name: Deploy to EKS
       #   run: |
