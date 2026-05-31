@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0c0f1d;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Main Cinematic Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        /* Sky Layer with Gradient */
+        .sky-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%; /* Pure background alignment stretch */
+            background: linear-gradient(to bottom, #7ba3cb 0%, #f1b392 40%, #fce1a6 70%, #fff4cc 100%);
+            z-index: 1;
+        }
+
+        /* Glowing Sunrise Sun Rays Effect */
+        .sun-rays {
+            position: absolute;
+            top: 25%;
+            right: 25%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,253,230,1) 0%, rgba(253,205,142,0.5) 30%, rgba(255,255,255,0) 70%);
+            transform: translate(50%, -50%);
+            mix-blend-mode: screen;
+            z-index: 2;
+            animation: sunGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes sunGlow {
+            0% { transform: translate(50%, -50%) scale(0.95); opacity: 0.8; }
+            100% { transform: translate(50%, -50%) scale(1.05); opacity: 1; }
+        }
+
+        /* Beautiful Foreground Flower Meadow */
+        .foreground-meadow {
+            position: absolute;
+            bottom: 0;
+            width: 115%;
+            height: 45%;
+            left: -7%;
+            background: linear-gradient(to bottom, #8fa967 0%, #597337 40%, #31441a 100%);
+            clip-path: ellipse(85% 100% at 50% 100%);
+            z-index: 3;
+            box-shadow: inset 0 50px 50px rgba(255,244,200,0.25);
+            animation: meadowZoom 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes meadowZoom {
+            0% { transform: scale(1) translateY(0); }
+            100% { transform: scale(1.05) translateY(5px); }
+        }
+
+        /* Decorative SVG Flowers Layer */
+        .flowers-overlay {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+        }
+
+        /* Canvas for Floating Petals */
+        #petalCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* Ambient Lighting Overlay */
+        .lighting-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 75% 25%, rgba(255,230,180,0.2) 0%, rgba(0,0,0,0) 60%);
+            z-index: 6;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        /* Glassmorphic Sentiment Dashboard Wrapper */
+        .dashboard-card {
+            position: relative;
+            width: 90%;
+            max-width: 550px;
+            background: rgba(15, 23, 42, 0.35);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+            z-index: 10; /* Brought forward inside layouts */
+            color: #f8fafc;
+            text-align: center;
+        }
+
+        .dashboard-card h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #ffffff, #ffe4e6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        .dashboard-card p {
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            color: #f1f5f9;
+        }
+
+        textarea {
+            width: 100%;
+            height: 130px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 15px;
+            color: #f8fafc;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.2);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
+        /* Spinner Component */
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Dynamic Server Response Result Wrapper Box */
+        .result-container {
+            margin-top: 25px;
+            border-radius: 14px;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(8px);
+            border: 1px solid transparent;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .sentiment-positive {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        .sentiment-negative {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .sentiment-neutral {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes windSway {
+            0% { transform: rotate(-2deg); }
+            100% { transform: rotate(3deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-container">
+        <div class="sky-layer"></div>
+        <div class="sun-rays"></div>
+
+        <div class="foreground-meadow">
+            <svg class="flowers-overlay" viewBox="0 0 1440 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g class="flower-group" style="transform-origin: 200px 400px; animation: windSway 4s ease-in-out infinite alternate;">
+                    <circle cx="200" cy="380" r="12" fill="#e57399" />
+                    <circle cx="185" cy="380" r="10" fill="#f099b5" />
+                    <circle cx="215" cy="380" r="10" fill="#f099b5" />
+                    <circle cx="200" cy="365" r="10" fill="#f099b5" />
+                    <circle cx="200" cy="395" r="10" fill="#f099b5" />
+                    <circle cx="200" cy="380" r="5" fill="#f3d078" />
+                    <line x1="200" y1="380" x2="200" y2="500" stroke="#465c2b" stroke-width="4" />
+                </g>
+
+                <g class="flower-group" style="transform-origin: 800px 350px; animation: windSway 4.5s ease-in-out infinite alternate-reverse;">
+                    <circle cx="800" cy="320" r="16" fill="#e57399" />
+                    <circle cx="780" cy="320" r="14" fill="#f4a4be" />
+                    <circle cx="820" cy="320" r="14" fill="#f4a4be" />
+                    <circle cx="800" cy="300" r="14" fill="#f4a4be" />
+                    <circle cx="800" cy="340" r="14" fill="#f4a4be" />
+                    <circle cx="800" cy="320" r="7" fill="#fcdb82" />
+                    <line x1="800" y1="320" x2="800" y2="500" stroke="#3b5024" stroke-width="5" />
+                </g>
+
+                <circle cx="450" cy="420" r="8" fill="#f6ca45" />
+                <circle cx="442" cy="415" r="6" fill="#fbe18a" />
+                <circle cx="458" cy="425" r="6" fill="#fbe18a" />
+                
+                <circle cx="1100" cy="390" r="9" fill="#d94556" />
+                <circle cx="1092" cy="385" r="7" fill="#e77481" />
+                <circle cx="1108" cy="395" r="7" fill="#e77481" />
+
+                <circle cx="650" cy="450" r="11" fill="#f6ca45" />
+                <circle cx="950" cy="430" r="10" fill="#e57399" />
+            </svg>
+        </div>
+
+        <canvas id="petalCanvas"></canvas>
+        <div class="lighting-overlay"></div>
+
+        <div class="dashboard-card">
+            <h1><i class="fa-solid fa-wand-magic-sparkles"></i> Sentiment Engine</h1>
+            <p>Analyze text context and emotional intents dynamically</p>
+
+            <form action="/predict" method="POST" id="analyzerForm">
+                <div class="form-group">
+                    <label for="textInput">Write Text</label>
+                    <textarea id="textInput" name="text" placeholder="Enter your sentence or paragraph here to analyze sentiment intents..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span id="btnText">Predict Sentiment</span>
+                    <div class="spinner" id="btnSpinner"></div>
+                </button>
+            </form>
+
+            {% if result is not none %}
+                {% set result_str = result|string|lower %}
+                <div class="result-container 
+                    {% if 'positive' in result_str or result_str == '1' or result_str == 'pos' %}
+                        sentiment-positive
+                    {% elif 'negative' in result_str or result_str == '0' or result_str == 'neg' %}
+                        sentiment-negative
+                    {% else %}
+                        sentiment-neutral
+                    {% endif %}">
+                    
+                    {% if 'positive' in result_str or result_str == '1' or result_str == 'pos' %}
+                        <i class="fa-solid fa-face-smile fa-lg"></i> Positive Sentiment Detected
+                    {% elif 'negative' in result_str or result_str == '0' or result_str == 'neg' %}
+                        <i class="fa-solid fa-face-frown fa-lg"></i> Negative Sentiment Detected
+                    {% else %}
+                        <i class="fa-solid fa-circle-info fa-lg"></i> Result: {{ result }}
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('petalCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const petals = [];
+        const maxPetals = 25;
+
+        class Petal {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height - canvas.height;
+                this.size = Math.random() * 8 + 5;
+                this.speedX = Math.random() * 1.5 + 0.5;
+                this.speedY = Math.random() * 1 + 0.5;
+                this.opacity = Math.random() * 0.6 + 0.3;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 2 - 1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.rotation += this.rotationSpeed;
+
+                if (this.y > canvas.height || this.x > canvas.width) {
+                    this.x = Math.random() * canvas.width - 100;
+                    this.y = -20;
+                    this.opacity = Math.random() * 0.6 + 0.3;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate((this.rotation * Math.PI) / 180);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.size, this.size / 1.5, 0, 0, 2 * Math.PI);
+                ctx.fillStyle = `rgba(244, 164, 190, ${this.opacity})`;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < maxPetals; i++) {
+            petals.push(new Petal());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            petals.forEach(petal => {
+                petal.update();
+                petal.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Submit Button loading trigger script
+        document.getElementById('analyzerForm').addEventListener('submit', function() {
+            const btn = document.getElementById('submitBtn');
+            const text = document.getElementById('btnText');
+            const spinner = document.getElementById('btnSpinner');
+            
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.85';
+            text.innerText = 'Analyzing text context...';
+            spinner.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
