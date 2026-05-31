@@ -14,31 +14,27 @@ from src.logger import logging
 # Below code block is for production use
 # -------------------------------------------------------------------------------------
 # Set up DagsHub credentials for MLflow tracking
-dagshub_token = os.getenv("CAPSTONE_TEST")
+dagshub_token = os.getenv("atlas")
 if not dagshub_token:
-    raise EnvironmentError("CAPSTONE_TEST environment variable is not set")
+    raise EnvironmentError("atlas environment variable is not set")
 
 os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
-dagshub_url = "https://dagshub.com/Suraj-Kumar09/Capstone-Project.mlflow"
-repo_owner = "Suraj-Kumar09"
-repo_name = "Capstone-Project"
-
 # Set up MLflow tracking URI
-mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
+mlflow.set_tracking_uri('https://dagshub.com/Suraj-Kumar09/Capstone-Project.mlflow')
 
+# Initialize DagsHub for MLflow tracking
+dagshub.init(repo_owner='Suraj-Kumar09', repo_name='Capstone-Project', mlflow=True)
 # -------------------------------------------------------------------------------------
 
 # Below code block is for local use (ci.yaml file bnate time esko comment krna hai )
 # -------------------------------------------------------------------------------------
-
 # mlflow.set_tracking_uri('https://dagshub.com/Suraj-Kumar09/Capstone-Project.mlflow')
 # dagshub.init(repo_owner='Suraj-Kumar09', repo_name='Capstone-Project', mlflow=True)
-
 # -------------------------------------------------------------------------------------
 
-#  model evaluation ke liye funtion create kiya hai. Jo models/model.pkl file se model load karega.
+# model evaluation ke liye funtion create kiya hai. Jo models/model.pkl file se model load karega.
 def load_model(file_path: str):
     """Load the trained model from a file."""
     try:
@@ -53,7 +49,7 @@ def load_model(file_path: str):
         logging.error('Unexpected error occurred while loading the model: %s', e)
         raise
 
-#  Testing data load karega. x_test aur y_test ke liye model load karega.
+# Testing data load karega. x_test aur y_test ke liye model load karega.
 def load_data(file_path: str) -> pd.DataFrame:
     """Load data from a CSV file."""
     try:

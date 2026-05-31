@@ -32,10 +32,12 @@ jobs:
       - name: run pipeline
         env:
           PYTHONPATH: ${{ github.workspace }}
-          DAGSHUB_USER_TOKEN: ${{ secrets.atlas }}
+          # Python code "atlas" dhoond raha hai, toh yahan wahi naam map kiya hai
+          atlas: ${{ secrets.atlas }} 
         run: |
           git config --global user.email "ci@github.com"
           git config --global user.name "CI Runner"
+          dvc pull
           dvc repro -f
 
       # - name: Run model tests
