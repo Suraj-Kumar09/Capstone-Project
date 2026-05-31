@@ -39,7 +39,7 @@ dagshub.init(repo_owner='Suraj-Kumar09', repo_name='Capstone-Project', mlflow=Tr
 def load_model(file_path: str):
     """Load the trained model from a file."""
     try:
-        with open(file_path, 'rb') as file:
+        with open(file_path, 'rb') as file: 
             model = pickle.load(file)
         logging.info('Model loaded from %s', file_path)
         return model
