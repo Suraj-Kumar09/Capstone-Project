@@ -37,13 +37,13 @@ jobs:
           git config --global user.email "ci@github.com"
           git config --global user.name "CI Runner"
           
-          # DVC Remote configuration
-          python -m dvc remote add -d myremote s3://complaints-datagrid
-          python -m dvc remote modify myremote --local auth basic
-          python -m dvc remote modify myremote --local user $DVC_REMOTE_USER
-          python -m dvc remote modify myremote --local password $DVC_REMOTE_PASSWORD
+          # DagsHub se mili commands ko use karein
+          python -m dvc remote add -d origin https://dagshub.com/Suraj-Kumar09/Capstone-Project.dvc
+          python -m dvc remote modify origin --local auth basic
+          python -m dvc remote modify origin --local user $DVC_REMOTE_USER
+          python -m dvc remote modify origin --local password $DVC_REMOTE_PASSWORD
           
-          # DVC pull aur repro
+          # Data pull aur pipeline run karein
           python -m dvc pull
           python -m dvc repro -f
 
