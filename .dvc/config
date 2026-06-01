@@ -2,3 +2,4 @@
     remote = myremote
 ['remote "myremote"']
     url = s3://complaints-datagrid
+    endpointurl = https://dagshub.com/s3
