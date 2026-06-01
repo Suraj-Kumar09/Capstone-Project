@@ -30,20 +30,21 @@ jobs:
 
       - name: run pipeline
         env:
-          PYTHONPATH: ${{ github.workspace }}
           DVC_REMOTE_USER: ${{ secrets.DAGSHUB_USERNAME }}
           DVC_REMOTE_PASSWORD: ${{ secrets.ATLAS }}
         run: |
           git config --global user.email "ci@github.com"
           git config --global user.name "CI Runner"
           
-          # DagsHub se mili commands ko use karein
+          # Remote add karein
           python -m dvc remote add -d origin https://dagshub.com/Suraj-Kumar09/Capstone-Project.dvc
-          python -m dvc remote modify origin --local auth basic
-          python -m dvc remote modify origin --local user $DVC_REMOTE_USER
-          python -m dvc remote modify origin --local password $DVC_REMOTE_PASSWORD
           
-          # Data pull aur pipeline run karein
+          # Auth setup - yaha variable ko double quotes mein use karein
+          python -m dvc remote modify origin auth basic
+          python -m dvc remote modify origin user "${DVC_REMOTE_USER}"
+          python -m dvc remote modify origin password "${DVC_REMOTE_PASSWORD}"
+          
+          # Data pull aur pipeline
           python -m dvc pull
           python -m dvc repro -f
 
