@@ -37,10 +37,17 @@ jobs:
           git config --global user.email "ci@github.com"
           git config --global user.name "CI Runner"
           
-          # DVC command not found ko fix karne ke liye 'python -m' use karein
+          # DVC Remote configuration
+          python -m dvc remote add -d myremote s3://complaints-datagrid
+          python -m dvc remote modify myremote --local auth basic
+          python -m dvc remote modify myremote --local user $DVC_REMOTE_USER
+          python -m dvc remote modify myremote --local password $DVC_REMOTE_PASSWORD
+          
+          # DVC pull aur repro
           python -m dvc pull
           python -m dvc repro -f
 
+      # --- COMMENTED SECTIONS ---
       # - name: Run model tests
       #   env:
       #     atlas: ${{ secrets.ATLAS }}
@@ -100,3 +107,4 @@ jobs:
       # - name: Deploy to EKS
       #   run: |
       #     kubectl apply -f deployment.yaml
+# Triggering pipeline update
