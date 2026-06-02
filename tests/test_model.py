@@ -1,5 +1,3 @@
-# load test + signature test + performance test
-
 import unittest
 import mlflow
 import os
@@ -19,9 +17,10 @@ class TestModelLoading(unittest.TestCase):
         os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
         os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
+        # Updated configuration for your repository
         dagshub_url = "https://dagshub.com"
-        repo_owner = "vikashdas770"
-        repo_name = "YT-Capstone-Project"
+        repo_owner = "Suraj-Kumar09"
+        repo_name = "Capstone-Project"
 
         # Set up MLflow tracking URI
         mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
@@ -74,7 +73,7 @@ class TestModelLoading(unittest.TestCase):
         # Calculate performance metrics for the new model
         accuracy_new = accuracy_score(y_holdout, y_pred_new)
         precision_new = precision_score(y_holdout, y_pred_new)
-        recall_new = recall_score(y_holdout, y_pred_new)
+        recall_new = recall_score(y_test=y_holdout, y_pred=y_pred_new) # Corrected argument naming
         f1_new = f1_score(y_holdout, y_pred_new)
 
         # Define expected thresholds for the performance metrics
