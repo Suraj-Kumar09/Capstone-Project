@@ -7,10 +7,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: setup python
+      - name: Setup Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
@@ -23,16 +23,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: install dependencies
+      - name: Install dependencies
         run: |
           pip install -r requirements.txt
+          pip install "dvc[s3]"
 
-      - name: run pipeline
+      - name: DVC Pull Data and Models
+        env:
+          CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
+        run: |
+          dvc pull
+
+      - name: Run pipeline
         env:
           CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
         run: |
           dvc repro
-
 
       - name: Run model tests
         env:
