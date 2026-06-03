@@ -17,7 +17,7 @@ class TestModelLoading(unittest.TestCase):
         os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
         os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
-        # Updated configuration for your repository
+        # Configuration for your repository
         dagshub_url = "https://dagshub.com"
         repo_owner = "Suraj-Kumar09"
         repo_name = "Capstone-Project"
@@ -58,31 +58,33 @@ class TestModelLoading(unittest.TestCase):
         # Verify the input shape
         self.assertEqual(input_df.shape[1], len(self.vectorizer.get_feature_names_out()))
 
-        # Verify the output shape (assuming binary classification with a single output)
+        # Verify the output shape
         self.assertEqual(len(prediction), input_df.shape[0])
-        self.assertEqual(len(prediction.shape), 1)  # Assuming a single output column for binary classification
+        self.assertEqual(len(prediction.shape), 1)
 
     def test_model_performance(self):
         # Extract features and labels from holdout test data
-        X_holdout = self.holdout_data.iloc[:,0:-1]
-        y_holdout = self.holdout_data.iloc[:,-1]
+        X_holdout = self.holdout_data.iloc[:, 0:-1]
+        y_holdout = self.holdout_data.iloc[:, -1]
 
-        # Predict using the new model
-        y_pred_new = self.new_model.predict(X_holdout)
+        # Predict using the new model (using .values to avoid feature name mismatch warning)
+        y_pred_new = self.new_model.predict(X_holdout.values)
 
         # Calculate performance metrics for the new model
         accuracy_new = accuracy_score(y_holdout, y_pred_new)
         precision_new = precision_score(y_holdout, y_pred_new)
-        recall_new = recall_score(y_test=y_holdout, y_pred=y_pred_new) # Corrected argument naming
+        
+        # Fixed: Passed arguments positionally (y_true, y_pred)
+        recall_new = recall_score(y_holdout, y_pred_new)
         f1_new = f1_score(y_holdout, y_pred_new)
 
-        # Define expected thresholds for the performance metrics
+        # Define expected thresholds
         expected_accuracy = 0.40
         expected_precision = 0.40
         expected_recall = 0.40
         expected_f1 = 0.40
 
-        # Assert that the new model meets the performance thresholds
+        # Assert performance
         self.assertGreaterEqual(accuracy_new, expected_accuracy, f'Accuracy should be at least {expected_accuracy}')
         self.assertGreaterEqual(precision_new, expected_precision, f'Precision should be at least {expected_precision}')
         self.assertGreaterEqual(recall_new, expected_recall, f'Recall should be at least {expected_recall}')
