@@ -1,9 +1,10 @@
+# promote model
+
 import os
 import mlflow
-from mlflow.tracking import MlflowClient
 
 def promote_model():
-    # 1. Credentials
+    # Set up DagsHub credentials for MLflow tracking
     dagshub_token = os.getenv("CAPSTONE_TEST")
     if not dagshub_token:
         raise EnvironmentError("CAPSTONE_TEST environment variable is not set")
@@ -11,40 +12,35 @@ def promote_model():
     os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
     os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
-    # 2. Correct Repository Details (Aapki repo)
-    REPO_OWNER = "Suraj-Kumar09"
-    REPO_NAME = "Capstone-Project"
-    MODEL_NAME = "my_model"
+    dagshub_url = "https://dagshub.com"
+    repo_owner = "Suraj-Kumar09"
+    repo_name = "Capstone-Project"
 
-    mlflow.set_tracking_uri(f'https://dagshub.com/{REPO_OWNER}/{REPO_NAME}.mlflow')
-    client = MlflowClient()
+    # Set up MLflow tracking URI
+    mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 
-    # 3. SABSE LATEST Version uthayein (Staging stage par depend na rahein)
-    versions = client.search_model_versions(f"name='{MODEL_NAME}'")
-    if not versions:
-        print("No models found in Registry!")
-        return
-        
-    # Version list mein se sabse bada number (latest) nikalein
-    latest_version = max([int(v.version) for v in versions])
-    print(f"Latest model version found: {latest_version}")
+    client = mlflow.MlflowClient()
 
-    # 4. Archive current Production models
-    try:
-        prod_versions = client.get_latest_versions(MODEL_NAME, stages=["Production"])
-        for v in prod_versions:
-            print(f"Archiving production version: {v.version}")
-            client.transition_model_version_stage(MODEL_NAME, v.version, "Archived")
-    except:
-        print("No existing production model to archive.")
+    model_name = "my_model"
+    # Get the latest version in staging
+    latest_version_staging = client.get_latest_versions(model_name, stages=["Staging"])[0].version
 
-    # 5. Latest version ko Production mein Promote karein
+    # Archive the current production model
+    prod_versions = client.get_latest_versions(model_name, stages=["Production"])
+    for version in prod_versions:
+        client.transition_model_version_stage(
+            name=model_name,
+            version=version.version,
+            stage="Archived"
+        )
+
+    # Promote the new model to production
     client.transition_model_version_stage(
-        name=MODEL_NAME,
-        version=str(latest_version),
+        name=model_name,
+        version=latest_version_staging,
         stage="Production"
     )
-    print(f"Model version {latest_version} successfully promoted to Production.")
+    print(f"Model version {latest_version_staging} promoted to Production")
 
 if __name__ == "__main__":
     promote_model()

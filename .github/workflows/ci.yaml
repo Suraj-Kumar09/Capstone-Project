@@ -7,52 +7,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Python
+      - name: setup python
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: install dependencies
         run: |
           pip install -r requirements.txt
 
-      - name: Setup DVC Remote and Pull Data
+      - name: run pipeline
         env:
-          GDRIVE_TOKEN: ${{ secrets.CAPSTONE_TEST }} # Agar ye token hai
-          # GitHub Secrets mein DAGSHUB_USER aur DAGSHUB_TOKEN add karein
-          DVC_USER: ${{ secrets.DAGSHUB_USERNAME }} 
-          DVC_PASS: ${{ secrets.DAGSHUB_TOKEN }}
+          CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
         run: |
-          dvc remote add -d origin s3://dvc-storage/
-          dvc remote modify origin --local endpointurl https://dagshub.com/Suraj-Kumar09/Capstone-Project.s3
-          dvc remote modify origin --local auth basic
-          dvc remote modify origin --local user $DVC_USER
-          dvc remote modify origin --local password $DVC_PASS
-          dvc pull
+          dvc repro
 
-      - name: Run pipeline
+      - name: Run model tests
         env:
           CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
-        run: dvc repro -f
-
-      - name: Register model
-        env:
-          CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
-        run: python src/model/register_model.py
+        run: |
+          python -m unittest tests/test_model.py
 
       - name: Promote model to production
         if: success()
         env:
           CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
         run: python scripts/promote_model.py
-
-      - name: Run model tests
-        env:
-          CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
-        run: python -m unittest tests/test_model.py
 
       - name: Run Flask app tests
         if: success()
