@@ -10,9 +10,11 @@ class FlaskAppTests(unittest.TestCase):
     def test_home_page(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'<title>Sentiment Analysis</title>', response.data)
+        # Updated assertion to match the actual <title> in your HTML
+        self.assertIn(b'<title>Sentiment Analysis Dashboard</title>', response.data)
 
     def test_predict_page(self):
+        # Yeh check karta hai ki model input lene ke baad response de raha hai
         response = self.client.post('/predict', data=dict(text="I love this!"))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
