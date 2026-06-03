@@ -21,13 +21,16 @@ jobs:
 
       - name: Setup DVC Remote and Pull Data
         env:
-          CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
+          GDRIVE_TOKEN: ${{ secrets.CAPSTONE_TEST }} # Agar ye token hai
+          # GitHub Secrets mein DAGSHUB_USER aur DAGSHUB_TOKEN add karein
+          DVC_USER: ${{ secrets.DAGSHUB_USERNAME }} 
+          DVC_PASS: ${{ secrets.DAGSHUB_TOKEN }}
         run: |
-          # DVC remote configure aur data pull karna
-          dvc remote add -d origin https://dagshub.com/Suraj-Kumar09/Capstone-Project.dvc
+          dvc remote add -d origin s3://dvc-storage/
+          dvc remote modify origin --local endpointurl https://dagshub.com/Suraj-Kumar09/Capstone-Project.s3
           dvc remote modify origin --local auth basic
-          dvc remote modify origin --local user ${{ secrets.DAGSHUB_USERNAME }} # GitHub Secrets mein add karein
-          dvc remote modify origin --local password $CAPSTONE_TEST
+          dvc remote modify origin --local user $DVC_USER
+          dvc remote modify origin --local password $DVC_PASS
           dvc pull
 
       - name: Run pipeline
