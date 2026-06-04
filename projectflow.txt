@@ -1,5 +1,8 @@
 -------------------------Setting up project structure---------------------------
 
+
+# STEP 1 :-
+
 1. Create repo, clone it in local
 2. Create a virtual environment named 'atlas' - conda create -n atlas python=3.10
 3. Activate the virtual environment - conda activate atlas
@@ -7,6 +10,11 @@
 5. cookiecutter -c v1 https://github.com/drivendata/cookiecutter-data-science
 6. Rename src.models -> src.model
 7. git add - commit - push
+
+
+
+
+# STEP 2:-
 
 -------------------------Setup MLFlow on Dagshub---------------------------
 8. Go to: https://dagshub.com/dashboard
@@ -20,6 +28,10 @@
 14. dvc init
 15. create a local folder as "local_s3" (temporary work)
 16. on terminal - "dvc remote add -d mylocal local_s3"
+
+
+
+STEP 3:-
 
 17. Add code to below files/folders inside src dir:
     - logger
@@ -35,12 +47,17 @@
 21. Once do - dvc status
 22. git add - commit - push
 
+
+STEP 4:-
+
 23. Need to add S3 as remote storage - Create IAM User(keep cred) and S3 bucket
 24. pip install - dvc[s3] & awscli
 25. Checking/deleting dvc remote (optional) - [dvc remote list & dvc remote remove <name>] 
 26. Set aws cred - aws configure
 27. Add s3 as dvc remote storage - dvc remote add -d myremote s3://<bucket-name>
 
+
+STEP 5:-
 28. Create new dir - flask_app | Inside that, add rest of the files and dir
 29. pip install flask and run the app (dvc push - to push data to S3)
 
@@ -54,6 +71,8 @@
 
 31. Add dir "tests"&"scripts" and files within. This will contain our test related scripts for CI.
 
+
+# STEP 6:-
 >>>>> Moving to Docker <<<<<
 32. pip install pipreqs
 33. cd flask_app & do "pipreqs . --force"
@@ -63,8 +82,15 @@
 36. Try running the image: "docker run -p 8888:5000 capstone-app:latest"
     - This run will give 'OSError: capstone_test environment variable is not set'...obviously
     - alternate: docker run -p 8888:5000 -e CAPSTONE_TEST=54b1d67648a9b1267ef906fsdfsd8b292f779f0 capstone-app:latest
-    - docker push youruser/capstone-app:latest (optional)
+    - docker push 9801263970/capstone-app:latest (optional)
     - optional: try to delete image locally and pull it from dockerhub and run (optional)
+
+
+
+
+
+
+# STEP 7:-
 
 37. Setup aws services for below secrets and variables:
 	AWS_ACCESS_KEY_ID
@@ -76,6 +102,9 @@
 
 38. Execute CICD pipeline till the stage where we build and push image to ECR.
 
+
+
+# STEP 8:-
 
 ----------------------------------------------------------------------------------
 *********Setup required before moving to EKS deployment*********
